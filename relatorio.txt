@@ -1,0 +1,70 @@
+Implementei algo similar ao lz78 (não sei, não li o artigo), e não deve haver 
+qualquer quebra de direito, visto que é uma implementação bem mais ou menos.
+
+Este programa funciona com arquivos codificados em utf-16le
+
+Para a compressão, ele segue pelas linhas do pseudo-código presente na página
+da wikipédia https://pt.wikipedia.org/wiki/LZ78. A diferença é que uso algumas
+3-tuplas no lugar de 2-tuplas por motivos que comento mais à frente. Tudo é
+salvo em binário, há variação do tamanho do int do código conforme a
+quantidade de códigos.
+
+Para descomprimir, lê-se a quantidade de códigos no topo do arquivo, um inteiro
+sem sinal de 64 bits para determinar o tamanho em bytes do inteiro dos códigos,
+depois lê-se as linha, armazenando as tuplas num vetor e utilizando um método
+auxiliar para ir construindo o texto para saída.
+
+Colocando as 2-tuplas no arquivo binário, tive problemas para descomprimir,
+pois o meu método que transforma a árvore trie em string não imprime na ordem
+em que foram criadas as tuplas, o que acaba sendo um problema quando tem um
+indice referenciando a posição ordinal em que a tupla foi criada.
+
+Para sanar este problema, forçosamente coloquei o índice de criação no arquivo
+de saída, o que piorou em muito a taxa de compressão. Está taxa pode ser 
+melhorada com a impressão dos nós da trie na ordem em que foram criados,
+o que remove 1|2|4|8 bytes de toda tupla, dependendo da quantidade de códigos.
+
+Os dez exemplos estão na pasta ./exemplos/originais, e suas taxas de compressão
+são, em ordem lexicográfica:
+
+252/328 = 76,83% do tamanho original
+1023/1225 = 83,51% do tamanho original
+857/785 = 109,17% do tamanho original
+8/6 = 133,33% do tamanho original
+998/974 = 102,46% do tamanho original
+213/275 = 77,45% do tamanho original
+503/660 = 76,21% do tamanho original
+1403/1491 = 94,10% do tamanho original
+1511/1550 = 97,48% do tamanho original
+417/308 = 135,39% do tamanho original
+
+4 dos 10 arquivos ficaram maiores do que o original. 
+Compreensivelmente o último, que é em chinês, logo tendo mais
+caracteres e sendo mais difícil formar padrões que se repetem.
+
+A taxa de compressão média foi de 98,59%, o que é uma compressão
+e eu aceito. Sem o texto em chinês e o arquivo pequeno puxando a
+média para cima, a compressão aumenta para 71,72% do tamanho
+original do arquivo.
+
+Para desencargo de consciência, testei como fica a compressão
+sei a adição forçosa dos índices de criação nas tuplas. Esta é
+uma informação inútil por agora, pois o programa não consegue
+descomprimir estes arquivos, mas, se consertada a ordem de
+impressão no arquivo, o tamanho seria o mesmo.
+
+189/328 = 57,62% do tamanho original
+682/1225 = 55,67% do tamanho original
+572/785 = 72,87% do tamanho original
+6/6 = 100% do tamanho original
+665/974 = 68,27: do tamanho original
+160/275 = 58,18% do tamanho original
+377/660 = 57,12% do tamanho original
+935/1491 = 62,71% do tamanho original
+1008/1550 = 65,03% do tamanho original
+313/308 = 101,62% do tamanho original
+
+O arquivo em chinês ainda cresceu, huh. Média de 69,91% do tamanho do arquivo
+original, 62,18% sem o livro em chinês e o arquivo pequeno.
+
+
